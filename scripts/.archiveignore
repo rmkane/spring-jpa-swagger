@@ -1,0 +1,28 @@
+# Example .archiveignore file
+# Place this file in the directory you want to archive
+# Patterns use glob matching
+
+# Exclude
+scripts/
+
+# Generated
+output/
+target/
+logs/
+
+# Git
+.git/
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
