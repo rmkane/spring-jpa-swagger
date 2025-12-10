@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -46,6 +47,59 @@ public class GlobalExceptionHandler {
                 .errors(errors)
                 .build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        logger.debug("Data integrity violation", ex);
+
+        String message = ex.getMessage();
+        Throwable rootCause = ex.getRootCause();
+        String rootCauseMessage = rootCause != null ? rootCause.getMessage() : null;
+        String userMessage = "A conflict occurred with the provided data";
+
+        // Check both the exception message and root cause message
+        String fullMessage = (rootCauseMessage != null ? rootCauseMessage + " " : "")
+                + (message != null ? message : "");
+
+        // Parse PostgreSQL unique constraint violations
+        if (isUniqueConstraintViolation(fullMessage, "users_username_key", "username")) {
+            userMessage = "Username already exists";
+        } else if (isUniqueConstraintViolation(fullMessage, "users_email_key", "email")) {
+            userMessage = "Email already exists";
+        } else if (isUniqueConstraintViolation(fullMessage, "books_isbn_key", "isbn")) {
+            userMessage = "ISBN already exists";
+        } else if (fullMessage.contains("uk_book_author") ||
+                (fullMessage.contains("book_authors") && fullMessage.contains("unique"))) {
+            userMessage = "This book-author relationship already exists";
+        } else if (fullMessage.contains("unique constraint") ||
+                fullMessage.contains("duplicate key")) {
+            userMessage = "A record with this value already exists";
+        }
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.CONFLICT.value())
+                .error("Conflict")
+                .message(userMessage)
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Checks if the error message indicates a unique constraint violation for a
+     * specific constraint or field.
+     *
+     * @param message        the error message to check
+     * @param constraintName the database constraint name (e.g.,
+     *                       "users_username_key")
+     * @param fieldName      the field name (e.g., "username")
+     * @return true if the message indicates a unique constraint violation for the
+     *         given constraint or field
+     */
+    private boolean isUniqueConstraintViolation(String message, String constraintName, String fieldName) {
+        return message.contains(constraintName) ||
+                (message.contains(fieldName) && message.contains("unique"));
     }
 
     @ExceptionHandler(Exception.class)
