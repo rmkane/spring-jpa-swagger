@@ -14,6 +14,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @Transactional
 public class AuthorServiceImpl implements AuthorService {
@@ -38,34 +41,42 @@ public class AuthorServiceImpl implements AuthorService {
     @Transactional(readOnly = true)
     @SuppressWarnings("null")
     public AuthorResponse findById(@NonNull Long id) {
+        log.debug("Finding author by id: {}", id);
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", id));
+        log.debug("Found author: {} {}", author.getFirstName(), author.getLastName());
         return authorMapper.toResponse(author);
     }
 
     @Override
     @SuppressWarnings("null")
     public AuthorResponse create(@NonNull CreateAuthorRequest request) {
+        log.info("Creating author: {} {}", request.getFirstName(), request.getLastName());
         Author author = authorMapper.toEntity(request);
         Author saved = authorRepository.save(author);
+        log.info("Created author with id: {}", saved.getId());
         return authorMapper.toResponse(saved);
     }
 
     @Override
     @SuppressWarnings("null")
     public AuthorResponse update(@NonNull Long id, @NonNull UpdateAuthorRequest request) {
+        log.info("Updating author with id: {}", id);
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Author", id));
         authorMapper.updateEntity(request, author);
         Author updated = authorRepository.save(author);
+        log.info("Updated author with id: {}", updated.getId());
         return authorMapper.toResponse(updated);
     }
 
     @Override
     public void delete(@NonNull Long id) {
+        log.info("Deleting author with id: {}", id);
         if (!authorRepository.existsById(id)) {
             throw new ResourceNotFoundException("Author", id);
         }
         authorRepository.deleteById(id);
+        log.info("Deleted author with id: {}", id);
     }
 }
