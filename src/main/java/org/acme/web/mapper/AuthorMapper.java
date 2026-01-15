@@ -25,15 +25,9 @@ public interface AuthorMapper {
     @NonNull
     Author toEntity(@NonNull CreateAuthorRequest request);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "firstName", source = "firstName")
-    @Mapping(target = "lastName", source = "lastName")
-    @Mapping(target = "bio", source = "bio")
     @Mapping(target = "bookIds", source = "books", qualifiedByName = "booksToIds")
     @Mapping(target = "createdById", source = "createdBy.id")
     @Mapping(target = "updatedById", source = "updatedBy.id")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "updatedAt", source = "updatedAt")
     @NonNull
     AuthorResponse toResponse(@NonNull Author author);
 

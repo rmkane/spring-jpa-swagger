@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public UserResponse create(@NonNull CreateUserRequest request) {
         User user = userMapper.toEntity(request);
         User saved = userRepository.save(user);

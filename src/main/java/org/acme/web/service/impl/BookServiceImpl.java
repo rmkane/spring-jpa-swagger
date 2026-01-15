@@ -53,15 +53,7 @@ public class BookServiceImpl implements BookService {
     @SuppressWarnings("null")
     public BookResponse create(@NonNull CreateBookRequest request) {
         Book book = bookMapper.toEntity(request);
-
-        if (request.getAuthorIds() != null && !request.getAuthorIds().isEmpty()) {
-            Set<Author> authors = new HashSet<>(authorRepository.findAllById(request.getAuthorIds()));
-            if (authors.size() != request.getAuthorIds().size()) {
-                throw new ResourceNotFoundException("One or more authors not found");
-            }
-            book.setAuthors(authors);
-        }
-
+        validateAndSetAuthors(book, request.getAuthorIds());
         Book saved = bookRepository.save(book);
         return bookMapper.toResponse(saved);
     }
@@ -73,14 +65,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new ResourceNotFoundException("Book", id));
 
         bookMapper.updateEntity(request, book);
-
-        if (request.getAuthorIds() != null) {
-            Set<Author> authors = new HashSet<>(authorRepository.findAllById(request.getAuthorIds()));
-            if (authors.size() != request.getAuthorIds().size()) {
-                throw new ResourceNotFoundException("One or more authors not found");
-            }
-            book.setAuthors(authors);
-        }
+        validateAndSetAuthors(book, request.getAuthorIds());
 
         Book updated = bookRepository.save(book);
         return bookMapper.toResponse(updated);
@@ -92,5 +77,16 @@ public class BookServiceImpl implements BookService {
             throw new ResourceNotFoundException("Book", id);
         }
         bookRepository.deleteById(id);
+    }
+
+    private void validateAndSetAuthors(Book book, Set<Long> authorIds) {
+        if (authorIds == null || authorIds.isEmpty()) {
+            return;
+        }
+        Set<Author> authors = new HashSet<>(authorRepository.findAllById(authorIds));
+        if (authors.size() != authorIds.size()) {
+            throw new ResourceNotFoundException("One or more authors not found");
+        }
+        book.setAuthors(authors);
     }
 }

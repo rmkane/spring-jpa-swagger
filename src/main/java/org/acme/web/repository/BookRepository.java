@@ -14,15 +14,35 @@ import org.springframework.stereotype.Repository;
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Override
-    @Query("SELECT DISTINCT b FROM Book b LEFT JOIN FETCH b.authors LEFT JOIN FETCH b.createdBy LEFT JOIN FETCH b.updatedBy")
+    @Query("""
+            SELECT DISTINCT b
+            FROM Book b
+            LEFT JOIN FETCH b.authors
+            LEFT JOIN FETCH b.createdBy
+            LEFT JOIN FETCH b.updatedBy
+            """)
     @NonNull
     List<Book> findAll();
 
     @Override
-    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.authors LEFT JOIN FETCH b.createdBy LEFT JOIN FETCH b.updatedBy WHERE b.id = :id")
+    @Query("""
+            SELECT b
+            FROM Book b
+            LEFT JOIN FETCH b.authors
+            LEFT JOIN FETCH b.createdBy
+            LEFT JOIN FETCH b.updatedBy
+            WHERE b.id = :id
+            """)
     @NonNull
     Optional<Book> findById(@NonNull @Param("id") Long id);
 
-    @Query("SELECT b FROM Book b LEFT JOIN FETCH b.authors WHERE b.isbn = :isbn")
+    @Query("""
+            SELECT b
+            FROM Book b
+            LEFT JOIN FETCH b.authors
+            LEFT JOIN FETCH b.createdBy
+            LEFT JOIN FETCH b.updatedBy
+            WHERE b.isbn = :isbn
+            """)
     Optional<Book> findByIsbn(@NonNull @Param("isbn") String isbn);
 }

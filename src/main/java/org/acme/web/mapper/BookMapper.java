@@ -25,15 +25,9 @@ public interface BookMapper {
     @NonNull
     Book toEntity(@NonNull CreateBookRequest request);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "title", source = "title")
-    @Mapping(target = "isbn", source = "isbn")
-    @Mapping(target = "publicationYear", source = "publicationYear")
     @Mapping(target = "authorIds", source = "authors", qualifiedByName = "authorsToIds")
     @Mapping(target = "createdById", source = "createdBy.id")
     @Mapping(target = "updatedById", source = "updatedBy.id")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "updatedAt", source = "updatedAt")
     @NonNull
     BookResponse toResponse(@NonNull Book book);
 

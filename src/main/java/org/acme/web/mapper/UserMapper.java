@@ -17,13 +17,6 @@ public interface UserMapper {
     @NonNull
     User toEntity(@NonNull CreateUserRequest request);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "username", source = "username")
-    @Mapping(target = "email", source = "email")
-    @Mapping(target = "firstName", source = "firstName")
-    @Mapping(target = "lastName", source = "lastName")
-    @Mapping(target = "createdAt", source = "createdAt")
-    @Mapping(target = "updatedAt", source = "updatedAt")
     @NonNull
     UserResponse toResponse(@NonNull User user);
 
