@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::content})}">
+<th:block th:fragment="content">
+    <div>
+        <h1>Authors</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Bio</th>
+                    <th>Books</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="author : ${authors}">
+                    <td><a th:href="@{/authors/{id}(id=${author.id})}" th:text="${author.firstName + ' ' + author.lastName}">Name</a></td>
+                    <td class="muted" th:text="${#strings.abbreviate(author.bio, 80)}">—</td>
+                    <td>
+                        <ul class="ids" th:if="${author.bookIds != null and !author.bookIds.isEmpty()}">
+                            <li th:each="bid : ${author.bookIds}"><a th:href="@{/books/{id}(id=${bid})}" th:text="${'Book #' + bid}">Book</a></li>
+                        </ul>
+                        <span th:if="${author.bookIds == null or author.bookIds.isEmpty()}" class="muted">—</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(authors)}" class="muted">No authors yet.</p>
+    </div>
+</th:block>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::content})}">
+<th:block th:fragment="content">
+    <div>
+        <h1 th:text="${author.firstName + ' ' + author.lastName}">Name</h1>
+        <p th:if="${author.bio}" th:text="${author.bio}">Bio</p>
+        <p th:if="${author.bookIds != null and !author.bookIds.isEmpty()}">
+            <strong>Books</strong>
+            <ul class="ids">
+                <li th:each="bid : ${author.bookIds}"><a th:href="@{/books/{id}(id=${bid})}" th:text="${'Book #' + bid}">Book</a></li>
+            </ul>
+        </p>
+        <div class="meta">
+            <span th:if="${author.createdAt}">Created <span th:text="${#temporals.format(author.createdAt, 'yyyy-MM-dd HH:mm')}">—</span></span>
+        </div>
+        <p style="margin-top: 1rem;"><a th:href="@{/authors}">← Back to authors</a></p>
+    </div>
+</th:block>
+</html>

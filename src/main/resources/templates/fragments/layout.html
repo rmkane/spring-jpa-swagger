@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(content)">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title th:text="${pageTitle} ?: 'Library'">Library</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css"/>
+</head>
+<body>
+    <nav>
+        <div class="wrap">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/books}">Books</a>
+            <a th:href="@{/authors}">Authors</a>
+            <a href="/swagger-ui.html" target="_blank">API (Swagger)</a>
+        </div>
+    </nav>
+    <main class="wrap">
+        <div th:replace="${content}">Content</div>
+    </main>
+</body>
+</html>

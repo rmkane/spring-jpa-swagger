@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::content})}">
+<th:block th:fragment="content">
+    <div>
+        <h1>Library</h1>
+        <p class="muted">Browse books and authors.</p>
+        <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 0.5rem;"><a th:href="@{/books}">Books</a> — list all books</li>
+            <li><a th:href="@{/authors}">Authors</a> — list all authors</li>
+        </ul>
+        <p class="muted" style="margin-top: 1.5rem;">REST API: <a href="/swagger-ui.html" target="_blank">Swagger UI</a></p>
+    </div>
+</th:block>
+</html>
