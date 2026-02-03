@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -100,6 +101,32 @@ public class GlobalExceptionHandler {
     private boolean isUniqueConstraintViolation(String message, String constraintName, String fieldName) {
         return message.contains(constraintName) ||
                 (message.contains(fieldName) && message.contains("unique"));
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException ex) {
+        log.warn("Data access error", ex);
+        String message = ex.getMessage();
+        Throwable cause = ex.getCause();
+        if (cause != null) {
+            message = cause.getMessage();
+        }
+        // Invalid enum, constraint, or other DB error from procedure/query
+        boolean badRequest = message != null && (message.contains("invalid input value") ||
+                message.contains("enum") ||
+                message.contains("constraint") ||
+                message.contains("foreign key"));
+        HttpStatus status = badRequest ? HttpStatus.BAD_REQUEST : HttpStatus.INTERNAL_SERVER_ERROR;
+        String userMessage = badRequest
+                ? "Invalid or conflicting data: " + (message != null ? message : "check request")
+                : "A database error occurred";
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(userMessage)
+                .build();
+        return new ResponseEntity<>(error, status);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
